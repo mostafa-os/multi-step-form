@@ -456,7 +456,7 @@ p{
       :first-child{
         margin-bottom: 10px;
       }
-      span.salary{
+      .total{
         color: hsl(243, 100%, 62%);
         font-size: 20px;
         font-weight: bold;
