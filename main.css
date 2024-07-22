@@ -227,6 +227,7 @@ p{
           cursor: pointer;
           > input{
             -webkit-appearance: none;
+            -moz-appearance: none; 
             appearance: none;
           }
           .img{
@@ -286,7 +287,8 @@ p{
           display: flex;
         }
         .toggle-checkbox{
-          -webkit-appearance: none;
+          -webkit-appearance: none; 
+          -moz-appearance: none; 
           appearance: none;
         }
         .toggle{
@@ -329,7 +331,8 @@ p{
         border-radius: 6px;
         cursor: pointer;
         input{
-          -webkit-appearance: none;
+          -webkit-appearance: none; 
+          -moz-appearance: none; 
           appearance: none;
         }
         input + span{
