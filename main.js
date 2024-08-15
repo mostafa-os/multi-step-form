@@ -125,7 +125,6 @@ let currentStep = 1,
   validationArr = [, ,],
   toggleChecked,
   choosenPlanIndex = 0,
-  choosenPlan,
   step3Checked = [, ,],
   radioInputs,
   checkboxInput,
@@ -196,13 +195,11 @@ function step2(currentStep) {
   for (let i = 0; i < container.plans.length; i++) {
     let label = document.createElement("label");
     label.classList.add(`${container.plans[i].level}`);
-    if (i === 0) {
-      label.classList.add("checked");
-    }
 
     let input = document.createElement("input");
     input.type = "radio";
     input.name = "question";
+    if (choosenPlanIndex === i) input.checked = true;
     label.appendChild(input);
 
     let img = document.createElement("div");
@@ -220,27 +217,6 @@ function step2(currentStep) {
 
   //choose one plan
   radioInputs = document.querySelectorAll('input[type = "radio"]');
-
-  for (i = 0; i < radioInputs.length; i++) {
-    if (i === choosenPlanIndex) {
-      radioInputs.forEach((input) => {
-        input.parentElement.classList.remove("checked");
-      });
-      radioInputs[i].parentElement.classList.add("checked");
-      choosenPlan = radioInputs[i].nextElementSibling.nextElementSibling;
-    }
-  }
-
-  radioInputs.forEach((input, index) => {
-    input.addEventListener("change", () => {
-      for (let i = 0; i < radioInputs.length; i++) {
-        radioInputs[i].parentElement.classList.remove("checked");
-      }
-      input.parentElement.classList.add("checked");
-      choosenPlanIndex = index;
-      choosenPlan = input.nextElementSibling.nextElementSibling;
-    });
-  });
 
   let period = document.createElement("div");
   period.classList.add("period");
@@ -314,25 +290,15 @@ function step3(currentStep) {
   servicesInputs = document.querySelectorAll("input");
 
   servicesInputs.forEach((input, index) => {
-    if (step3Checked[index]) input.parentElement.classList.add("active");
-    else input.parentElement.classList.remove("active");
-  });
-
-  servicesInputs.forEach((input, index) => {
     input.checked = step3Checked[index];
-    input.addEventListener("change", () => {
-      if (input.checked) input.parentElement.classList.add("active");
-      else input.parentElement.classList.remove("active");
-      step3Checked[index] = input.checked;
-    });
   });
 }
-
 //step four function
 function step4(currentStep) {
   step.className = `step-${currentStep}`;
   document.querySelector("h2").innerHTML = mainObj.step4.title;
   document.querySelector("p").innerHTML = mainObj.step4.paragraph;
+
   content.innerHTML = "";
   newContent.innerHTML = "";
   nextButton.parentElement.style.justifyContent = "space-between";
@@ -349,11 +315,24 @@ function step4(currentStep) {
   main.innerHTML = `
       <div>
       <h4>${getChoosenPlan(choosenPlanIndex)}</h4>
-      <span class = ${container.change_span}>${container.change_span}</span>
     </div>`;
+
+  let changeSpan = document.createElement("span");
+  changeSpan.className = container.change_span;
+  changeSpan.textContent = container.change_span;
+  main.children[0].appendChild(changeSpan);
+
+  changeSpan.addEventListener("click", function () {
+    goBack();
+    goBack();
+  });
+
   let mainSalary = document.createElement("span");
   mainSalary.className = container.salary_span;
-  mainSalary.textContent = choosenPlan.children[1].textContent;
+  mainSalary.textContent =
+    radioInputs[
+      choosenPlanIndex
+    ].nextElementSibling.nextElementSibling.children[1].textContent;
   main.appendChild(mainSalary);
 
   top.appendChild(main);
@@ -382,8 +361,8 @@ function step4(currentStep) {
   down.className = "down";
 
   let s1 = document.createElement("span");
-  if (checkboxInput.checked) s1.textContent = container.total_month;
-  else s1.textContent = container.total_year;
+  if (checkboxInput.checked) s1.textContent = container.total_year;
+  else s1.textContent = container.total_month;
   down.appendChild(s1);
 
   let s2 = document.createElement("span");
@@ -423,6 +402,20 @@ function thankYou() {
 
 //next step button
 nextButton.addEventListener("click", function (e) {
+  if (currentStep !== 1) {
+    radioInputs.forEach((input, index) => {
+      if (input.checked) {
+        choosenPlanIndex = index;
+      }
+    });
+  }
+
+  if (servicesInputs) {
+    servicesInputs.forEach((input, index) => {
+      step3Checked[index] = input.checked;
+    });
+  }
+
   checkValidation(registerInputs);
 
   //handle error message
@@ -461,7 +454,21 @@ nextButton.addEventListener("click", function (e) {
 });
 
 //go back button
-backButton.addEventListener("click", function () {
+backButton.addEventListener("click", goBack);
+
+function goBack() {
+  radioInputs.forEach((input, index) => {
+    if (input.checked) {
+      choosenPlanIndex = index;
+    }
+  });
+
+  if (servicesInputs) {
+    servicesInputs.forEach((input, index) => {
+      step3Checked[index] = input.checked;
+    });
+  }
+
   for (let i = numbers.length - 1; i >= 0; i--) {
     if (numbers[1].classList.contains("active")) {
       backButton.style.display = "none";
@@ -479,7 +486,7 @@ backButton.addEventListener("click", function () {
   if (currentStep === 2) step2(currentStep);
   if (currentStep === 3) step3(currentStep);
   if (currentStep === 4) step4(currentStep);
-});
+}
 
 function checkValidation(registerInputs) {
   registerInputs.forEach((input, index) => {
